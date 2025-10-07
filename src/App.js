@@ -9,7 +9,7 @@ function App() {
   const [date, setDate] = useState("");
   const [client, setClient] = useState({ name: "", address: "" });
   const [items, setItems] = useState([]);
-  const [tax, setTax] = useState(10); // 10% tax for example
+  
 
      
   //     GENERATE INVOICE NUMBER AUTOMATICALLY
