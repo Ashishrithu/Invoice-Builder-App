@@ -2,18 +2,14 @@ import React, { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 
 function App() {
-     
-  //     STATE MANAGEMENT
-     
+  // STATE MANAGEMENT
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [date, setDate] = useState("");
   const [client, setClient] = useState({ name: "", address: "" });
   const [items, setItems] = useState([]);
-  
+  const [tax, setTax] = useState(0); // <-- added tax state
 
-     
-  //     GENERATE INVOICE NUMBER AUTOMATICALLY
-    
+  // GENERATE INVOICE NUMBER AUTOMATICALLY
   useEffect(() => {
     const today = new Date();
     const dateStr = today.toISOString().slice(0, 10).replace(/-/g, "");
@@ -23,40 +19,30 @@ function App() {
     setDate(today.toISOString().slice(0, 10));
   }, []);
 
-    
-  //     ADD ITEM FUNCTION
-     
+  // ADD ITEM FUNCTION
   const addItem = () => {
     setItems([...items, { description: "", quantity: 1, rate: 0 }]);
   };
 
-     
-  //     UPDATE ITEM FUNCTION
-     
+  // UPDATE ITEM FUNCTION
   const updateItem = (index, field, value) => {
     const updated = [...items];
     updated[index][field] = value;
     setItems(updated);
   };
 
-    
-  //     DELETE ITEM FUNCTION
-    
+  // DELETE ITEM FUNCTION
   const deleteItem = (index) => {
     const updated = items.filter((_, i) => i !== index);
     setItems(updated);
   };
 
-    
-  //     CALCULATIONS
-    
+  // CALCULATIONS
   const subtotal = items.reduce((sum, i) => sum + i.quantity * i.rate, 0);
   const taxAmount = (subtotal * tax) / 100;
   const total = subtotal + taxAmount;
 
-   
-  //     PDF EXPORT
-    
+  // PDF EXPORT
   const generatePDF = () => {
     const doc = new jsPDF();
     doc.text(`Invoice Number: ${invoiceNumber}`, 10, 10);
@@ -80,12 +66,9 @@ function App() {
     doc.save(`${invoiceNumber}.pdf`);
   };
 
-     
-  //     RENDER
-   
+  // RENDER
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 flex justify-center items-center p-6">
-
       <div className="card-glass w-full max-w-3xl">
         <h1 className="text-3xl font-bold text-center text-indigo-700 mb-6">
           Invoice Builder
@@ -127,7 +110,9 @@ function App() {
             className="input-modern"
             rows="3"
             value={client.address}
-            onChange={(e) => setClient({ ...client, address: e.target.value })}
+            onChange={(e) =>
+              setClient({ ...client, address: e.target.value })
+            }
           />
         </div>
 
@@ -160,7 +145,9 @@ function App() {
                 className="input-modern"
                 placeholder="Rate"
                 value={item.rate}
-                onChange={(e) => updateItem(i, "rate", Number(e.target.value))}
+                onChange={(e) =>
+                  updateItem(i, "rate", Number(e.target.value))
+                }
               />
               <button
                 onClick={() => deleteItem(i)}
@@ -173,6 +160,17 @@ function App() {
           <button onClick={addItem} className="btn-primary mt-3">
             + Add Item
           </button>
+        </div>
+
+        {/* Tax Input */}
+        <div className="mb-6">
+          <label className="font-semibold text-gray-700">Tax (%)</label>
+          <input
+            type="number"
+            className="input-modern"
+            value={tax}
+            onChange={(e) => setTax(Number(e.target.value))}
+          />
         </div>
 
         {/* Totals */}
